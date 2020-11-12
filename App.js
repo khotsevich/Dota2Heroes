@@ -1,21 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native'
+import React, { useState } from 'react'
+import { Provider } from 'react-redux'
+import { AppLoading } from 'expo'
+import { createStackNavigator } from '@react-navigation/stack'
+
+import { HeroScreen } from './src/screens/HeroScreen'
+import { bootstrap } from './src/bootstrap'
+import { MainScreen } from './src/screens/MainScreen'
+import store from './src/store/store'
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const [isReady, setIsReady] = useState(false)
+  const Stack = createStackNavigator()
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  if (!isReady) {
+    return (
+      <AppLoading
+        startAsync={bootstrap}
+        onFinish={() => setIsReady(true)}
+        onError={e => console.log(e)}
+      />
+    )
+  }
+
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName={'Main'}>
+          <Stack.Screen
+            name={'Main'}
+            component={MainScreen}
+            options={{ title: 'Dota 2 Heroes' }}
+          />
+          <Stack.Screen name={'Hero'} component={HeroScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  )
+}
